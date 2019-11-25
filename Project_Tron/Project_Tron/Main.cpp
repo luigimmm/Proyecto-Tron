@@ -6,32 +6,61 @@
 #include <string>
 #include <cctype>
 #include <iostream>
+#include <string>
 
 
 #include "Players.h"
 #include "Online.h"
 
 using std::cin;
+using std::cout;
+using std::string;
+
+//Funciones
+int GameLoop();
 
 //Variables globales
+sf::Packet packet1;
+sf::Packet packet2;
+
 bool game = 1;
 bool winOrLose = true;
-const int speedPlayer = 4;
+const int speedPlayer = 1;
 const int screenWidth = 800;
 const int screenHeight = 900;
+const unsigned short port = 5000;
 bool field[screenWidth][screenHeight] = { 0 }; //Sirve para poder detectar la colisión
 
 
-int main(){
+//----------------------------------------------
 
-	// Inicializa el generador de números aleatorios.
-	srand(time(0));
+int main() {
 
-	//Para poder mostrar la ventana
-	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "- > TRON < -");
+	char answer;
+	string answerStd;
+	Server objServer;
+	Client objClient;
 
-	//Limite de fps
-	window.setFramerateLimit(60);
+	cout << " Ingresa s, para ser el server o ingresa p1 o p2\n-->";z
+	cin >> answerStd;
+
+	if (answerStd == "s") {
+		objServer.InitializeServer();
+	}
+
+	if (answerStd == "p1" || answerStd == "p2") {
+		objClient.InitializeClient(answerStd);
+	}
+	return 0;
+}
+
+int GameLoop() {
+
+	srand(time(0));	// Inicializa el generador de números aleatorios.
+
+	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "- > TRON < -");	//Para poder mostrar la ventana
+
+	window.setFramerateLimit(60);	//Limite de fps
 
 	//Declaración de variables
 	sf::Texture texture;
@@ -45,8 +74,7 @@ int main(){
 
 	sf::Sprite spriteBackground(texture);
 
-	//Necesario para poder dibujar el fondo del tamaño de la pantalla
-	rTexture.create(screenWidth, screenHeight);
+	rTexture.create(screenWidth, screenHeight);	//Necesario para poder dibujar el fondo del tamaño de la pantalla
 	rTexture.setSmooth(true); //Función la textura aparece más suave para que los píxeles sean menos visibles.
 
 	sprite.setTexture(rTexture.getTexture());
@@ -86,7 +114,6 @@ int main(){
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { if (p2.m_dir != 1) { p2.m_dir = 2; } }
 
 
-
 		//Condición para finalizar el juego
 		if (!game) {
 			window.clear();
@@ -112,6 +139,7 @@ int main(){
 			window.display();
 			continue; 
 		}
+
 
 		for (int i = 0; i < speedPlayer; i++) {
 			p1.Mark(screenWidth, screenHeight);
@@ -146,4 +174,32 @@ int main(){
 		window.display();
 	}
 	return 0;
+}
+
+void Server::InitializeServer() {
+
+	m_listenerServer.listen(port);
+	bool p1 = false;
+	bool p2 = false;
+
+	if (p1 != true) {
+
+		m_listenerServer.accept(m_objClient.m_socketP1);
+		cout << "\n\nDireccion IP del cliente 1 conectado - - > " << m_objClient.m_socketP1.getRemoteAddress() << std::endl;
+		p1 = true;
+	}
+	if (p2 != true) {
+
+		m_listenerServer.accept(m_objClient.m_socketP2);
+		cout << "\n\nDireccion IP del cliente 2 conectado - - > " << m_objClient.m_socketP2.getRemoteAddress() << std::endl;
+		p2 = true;
+	}
+	if (p1 == true && p2 == true) {
+
+		sf::Thread juego1(GameLoop);
+		sf::Thread juego2(GameLoop);
+
+		juego1.launch();
+		juego2.launch();
+	}
 }

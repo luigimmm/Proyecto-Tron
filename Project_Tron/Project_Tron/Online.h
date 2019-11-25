@@ -1,23 +1,36 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+#include <string>
+
+class Client
+{
+	public:
+	
+		//Miembros
+		sf::TcpSocket m_socketP1;
+		sf::TcpSocket m_socketP2;
+	
+		//Metodos
+		void
+		InitializeClient(std::string _jugador);	//Función para inicializar el server
+		
+		Client();	//Constructor
+		~Client();	//Destructor
+};
 
 class Server 
 {
 	public:
-		//sf::TcpSocket socketServer;
-		//sf::Socket::Status statusServer;
-		//sf::TcpListener listenerServer;
 
+		//Miembros
+		sf::TcpListener m_listenerServer;
+		Client m_objClient;
 
-};
+		//Metodos
+		void
+		InitializeServer();	//Función para inicializar el server
 
-class Client 
-{
-	public:
-		//sf::
-
-		//Utilizar diferentes package para la información y tener uno por cada objeto
-		//Usar un package por cada objeto para enviar y recibir
-		//
+		Server();	//Constructor
+		~Server();	//Destructor
 };
